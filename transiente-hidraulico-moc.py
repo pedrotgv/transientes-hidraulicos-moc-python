@@ -212,6 +212,7 @@ with open(caminho_tempo, "w", encoding="utf-8") as f:
 
 tabela_maximos = np.array(tabela_maximos)
 caminho_tabela = os.path.join(pasta_saida, "resumo_pressao.csv")
+
 np.savetxt(
     caminho_tabela,
     tabela_maximos,
