@@ -2,24 +2,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+# --- CASOS SIMULADOS ---
+casos = [[1, 1,'aco', 0.5, 20],
+         [1, 0.1,'aco', 0.5, 20],
+         [1, 0.5,'aco', 0.5, 20],
+         [10, 1,'aco', 0.5, 20],
+         [0.1, 1,'aco', 0.5, 5],
+         [1, 1,'aco', 0.1, 20],
+         [1, 1,'aco', 2, 20],
+         [1, 1,'pvc', 0.5, 20],
+         [1, 1,'concreto', 0.5, 20],
+]
+celeridades = {'pvc':294.7, 'aco':1118.8, 'concreto':530.5 } # Materiais e respectivas celeridades (pvc, aco e concreto)
+
+caso_simulado = 0
+
 
 # --- DADOS SIMULAÇÃO ---
 Lt = 1000                # Comprimento da tubulação [m]
-Dx = 1                     # Discretização espacial [m]
-D = 1                      # Diâmetro Tubulação [m]
 f = 0.02                   # Fator de atrito
 g = 9.81                   # Gravidade [m/s²]
 H0 = 10                    # Nível do reservatório [m]
+
+Dx = casos[caso_simulado][0]                     # Discretização espacial [m]
+D = casos[caso_simulado][1]                     # Diâmetro Tubulação [m]
+material = casos[caso_simulado][2]
+c = celeridades[material]            # Celeridade Tubulação [m/s]
+TT = casos[caso_simulado][4]
+
 v0 = round(np.sqrt((H0*2*g)/(1+f*(Lt/D))),2)                     # Velocidade inicial [m/s]
 A0 = np.pi * D**2 / 4      # Área da seção Tubulação [m²]
 Q0 = v0 * A0               # Vazão inicial [m³/s]
-materiais = ['pvc', 'aco', 'concreto']
-material=materiais[2]
-c = 1000                   # Celeridade Tubulação [m/s]
-Dt = Dx / c                # Passo de tempo
-TT = 20                    # Tempo total de simulação [s]
+
+Dt = Dx / c                # Passo de tempo                  
 Tal = 2 * Lt / c           # Período da tubulação [s]
-TF = 0.5*Tal                   # Tempo fechamento Válvula [s]
+TF = casos[caso_simulado][3]*Tal                   # Tempo fechamento Válvula [s]
 
 
 # --- COEFICIENTES DO MÉTODO DAS CARACTERÍSTICAS ---
@@ -37,7 +54,7 @@ tempo = [0]                       # Matriz que vai armazenar os instantes de tem
 # --- MATRIZES DE RESULTADO ---
 pressao = np.zeros((Nt+1, Nx+1), dtype=np.float32)          # Cria uma matriz para armazenar os dados de pressão. Cada linha representa as pressões de cada ponto no instante, linha 1 instante t=0, linha 2 instante t=0+1*Dt
 vazao = np.zeros((Nt+1, Nx+1), dtype=np.float32)            # Cria uma matriz para armazenar os dados de vazão. Cada linha representa as vazões de cada ponto no instante, linha 1 instante t=0, linha 2 instante t=0+1*Dt
-terreno =  np.ones(Nx+1) * 0                                # Cria uma matriz do mesmo tamanho da tubulação que contém o valor da cota topográfica de cada ponto do terreno em que a tubulação esta apoiada.
+terreno =  np.ones(Nx+1) * 1000                                # Cria uma matriz do mesmo tamanho da tubulação que contém o valor da cota topográfica de cada ponto do terreno em que a tubulação esta apoiada.
 
 
 # --- ESTADO INICIAL --- 
