@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation
 
 
 # --- DADOS SIMULAÇÃO ---
-Lt = 1000                  # Comprimento da tubulação [m]
+Lt = 10                # Comprimento da tubulação [m]
 Dx = 1                     # Discretização espacial [m]
 D = 1                      # Diâmetro Tubulação [m]
 f = 0.02                   # Fator de atrito
