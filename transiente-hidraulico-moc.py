@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation
 
 
 # --- DADOS SIMULAÇÃO ---
-Lt = 10                # Comprimento da tubulação [m]
+Lt = 1000                # Comprimento da tubulação [m]
 Dx = 1                     # Discretização espacial [m]
 D = 1                      # Diâmetro Tubulação [m]
 f = 0.02                   # Fator de atrito
@@ -13,11 +13,13 @@ H0 = 10                    # Nível do reservatório [m]
 v0 = round(np.sqrt((H0*2*g)/(1+f*(Lt/D))),2)                     # Velocidade inicial [m/s]
 A0 = np.pi * D**2 / 4      # Área da seção Tubulação [m²]
 Q0 = v0 * A0               # Vazão inicial [m³/s]
+materiais = ['pvc', 'aco', 'concreto']
+material=materiais[2]
 c = 1000                   # Celeridade Tubulação [m/s]
 Dt = Dx / c                # Passo de tempo
 TT = 20                    # Tempo total de simulação [s]
 Tal = 2 * Lt / c           # Período da tubulação [s]
-TF = Tal                   # Tempo fechamento Válvula [s]
+TF = 0.5*Tal                   # Tempo fechamento Válvula [s]
 
 
 # --- COEFICIENTES DO MÉTODO DAS CARACTERÍSTICAS ---
@@ -87,11 +89,7 @@ for t in range(1, Nt+1):
 # --- SELECIONA DADOS DE INTERESSE ---
 envol_max = np.max(pressao, axis=0)     # Olha a matriz de pressões e seleciona o maior valor de cada ponto.
 envol_min = np.min(pressao, axis=0)     # Olha a matriz de pressões e seleciona o menor valor de cada ponto.
-meio_p = pressao.shape[1] // 2
-coluna_p = pressao[:, meio_p]           # Olha a matriz de pressões e seleciona uma coluna específica
 coluna_v_final = vazao[:, Nx]           # Olha a matriz de vazões e seleciona a última coluna.
-meio_v = vazao.shape[1] // 2
-coluna_v = vazao[:, meio_v]             # Olha a matriz de vazões e seleciona uma coluna específica
 
 # --- CRIAÇÃO DA ANIMAÇÃO ---
 ## --- Gráfico da pressão ao longo da tubulação que será utilizado na animação ---
@@ -111,49 +109,32 @@ ax1.grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=
 
 
 # --- CRIAÇÃO DOS GRÁFICOS ---
-fig2, ax2 = plt.subplots(2, 2, figsize=(15, 20))
+fig2, ax2 = plt.subplots(2, 1, figsize=(15, 20))
 fig2.suptitle("Caso 2", fontsize=18, y=0.98)
 
-texto = f"Dx={Dx} m, Lx={Lt} m, D={D} m, f={f}, c={c} m/s, TF={round(TF/Tal,2)}τ s, H0={H0} m.c.a, V0={v0} m/s"
+texto = f"Dx={Dx} m, Lx={Lt} m, D={D} m, f={f}, c={c} m/s, Material: {material} TF={round(TF/Tal,2)}τ s, H0={H0} m.c.a, V0={v0} m/s"
 fig2.text(0.5, 0.02, texto, ha='center', va='bottom', fontsize=12)
-
-## --- Gráfico da pressão da coluna específicada ao longo do tempo ---
-pressao_tempo, = ax2[1,0].plot(tempo, coluna_p, color='r', label='Pressão')
-ax2[1,0].set_xlabel("Tempo (s)")
-ax2[1,0].set_ylabel("Pressão (m.c.a)")
-ax2[1,0].set_title("Pressão no meio")
-ax2[1,0].legend(loc='upper left', fontsize=10)
-ax2[1,0].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
 
 
 ## --- Gráfico das envoltórias ---
-envolt_max = ax2[0,0].plot(x, envol_max+terreno, color="r", label='Pressão máxima')
-envolt_min = ax2[0,0].plot(x, envol_min+terreno, color="b", label='Pressão mínima')
-ax2[0,0].fill_between(x, envol_min + terreno, envol_max + terreno, color='lightgray', alpha=0.6, label='Envoltória')
-linha_terreno, = ax2[0,0].plot(x, terreno, color='k', label='Tubulação', linestyle='--', alpha=0.8)
-ax2[0,0].set_xlabel("Comprimento (m)")
-ax2[0,0].set_ylabel("Pressão (m.c.a)")
-ax2[0,0].set_title("Envoltória de pressões")
-ax2[0,0].legend(loc='upper left', fontsize=10)
-ax2[0,0].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
-ax2[0,0].text(Lt-200,terreno[0]-20, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', fontsize=10)
+envolt_max = ax2[0].plot(x, envol_max+terreno, color="r", label='Pressão máxima')
+envolt_min = ax2[0].plot(x, envol_min+terreno, color="b", label='Pressão mínima')
+ax2[0].fill_between(x, envol_min + terreno, envol_max + terreno, color='lightgray', alpha=0.6, label='Envoltória')
+linha_terreno, = ax2[0].plot(x, terreno, color='k', label='Tubulação', linestyle='--', alpha=0.8)
+ax2[0].set_xlabel("Comprimento (m)")
+ax2[0].set_ylabel("Pressão (m.c.a)")
+ax2[0].set_title("Envoltória de pressões")
+ax2[0].legend(loc='upper left', fontsize=10)
+ax2[0].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
+ax2[0].text(Lt-200,terreno[0]-20, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', fontsize=10)
 
 ## --- Gráfico da vazão na válvula ---
-vazao_valv, = ax2[1,1].plot(tempo, coluna_v_final, color='b', label='Vazão')
-ax2[1,1].set_xlabel("Tempo (s)")
-ax2[1,1].set_ylabel("Vazão (m³/s)")
-ax2[1,1].set_title("Vazão na válvula")
-ax2[1,1].legend(loc='upper left', fontsize=10)
-ax2[1,1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
-
-## --- Gráfico da vazão da coluna específicada ao longo do tempo ---
-vazao_tempo, = ax2[0,1].plot(tempo, coluna_v, color='b', label='Vazão')
-ax2[0,1].set_xlabel("Tempo (s)")
-ax2[0,1].set_ylabel("Vazão (m³/s)")
-ax2[0,1].set_title("Vazão no meio")
-ax2[0,1].legend(loc='upper left', fontsize=10)
-ax2[0,1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
-
+vazao_valv, = ax2[1].plot(tempo, coluna_v_final, color='b', label='Vazão')
+ax2[1].set_xlabel("Tempo (s)")
+ax2[1].set_ylabel("Vazão (m³/s)")
+ax2[1].set_title("Vazão na válvula")
+ax2[1].legend(loc='upper left', fontsize=10)
+ax2[1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
 
 ## --- Função para atualizar o gráfico da pressão no tempo ---
 def atualizar_p(frame):
