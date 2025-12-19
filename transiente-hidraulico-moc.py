@@ -11,19 +11,17 @@ os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráfico
 animacao = False     # Define se vai ser gerada a animação
 
 # --- CASOS SIMULADOS ---
-casos = [[1, 1,1118.8, 0.5, 20],
-         [1, 0.1,1118.8, 0.5, 20],
-         [1, 0.5,1118.8, 0.5, 20],
-         [10, 1,1118.8, 0.5, 20],
-         [0.1, 1,1118.8, 0.5, 2],
-         [1, 1,1118.8, 0.1, 20],
-         [1, 1,1118.8, 2, 20],
-         [1, 1,294.7, 0.5, 20],
-         [1, 1,530.5, 0.5, 20],
+casos = [[1, 1, 1278.8, 0.5, 20],
+         [1, 0.15, 1379.5, 0.5, 20],
+         [1, 0.5, 1342.5, 0.5, 20],
+         [10, 1, 1278.8, 0.5, 20],
+         [0.1, 1, 1278.8, 0.5, 2],
+         [1, 1, 1278.8, 0.1, 20],
+         [1, 1, 1278.8, 2, 20],
+         [1, 1, 620.5, 0.5, 20],
+         [1, 0.5, 622.9, 0.5, 20],
 ]
 # Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
-
-celeridades = {'pvc':294.7, 'aco':1118.8, 'concreto':530.5 } # Materiais e respectivas celeridades (pvc, aco e concreto)
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
 tabela_maximos = []
