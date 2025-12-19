@@ -11,21 +11,22 @@ os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráfico
 animacao = False     # Define se vai ser gerada a animação
 
 # --- CASOS SIMULADOS ---
-casos = [[1, 1,'aco', 0.5, 20],
-         [1, 0.1,'aco', 0.5, 20],
-         [1, 0.5,'aco', 0.5, 20],
-         [10, 1,'aco', 0.5, 20],
-         [0.1, 1,'aco', 0.5, 5],
-         [1, 1,'aco', 0.1, 20],
-         [1, 1,'aco', 2, 20],
-         [1, 1,'pvc', 0.5, 20],
-         [1, 1,'concreto', 0.5, 20],
+casos = [[1, 1,1118.8, 0.5, 20],
+         [1, 0.1,1118.8, 0.5, 20],
+         [1, 0.5,1118.8, 0.5, 20],
+         [10, 1,1118.8, 0.5, 20],
+         [0.1, 1,1118.8, 0.5, 2],
+         [1, 1,1118.8, 0.1, 20],
+         [1, 1,1118.8, 2, 20],
+         [1, 1,294.7, 0.5, 20],
+         [1, 1,530.5, 0.5, 20],
 ]
-# Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material, Tal, Tempo de simulação
+# Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
 
 celeridades = {'pvc':294.7, 'aco':1118.8, 'concreto':530.5 } # Materiais e respectivas celeridades (pvc, aco e concreto)
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
+tabela_maximos = []
 
 for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     t_inicio = time.time()
@@ -38,8 +39,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
 
     Dx = casos[caso_simulado][0]                    # Discretização espacial [m]
     D = casos[caso_simulado][1]                     # Diâmetro Tubulação [m]
-    material = casos[caso_simulado][2]              # Material da tubulação 
-    c = celeridades[material]                       # Celeridade Tubulação [m/s]
+    c = casos[caso_simulado][2]                       # Celeridade Tubulação [m/s]
     TT = casos[caso_simulado][4]                    # Tempo total de simulação [s]
 
     v0 = round(np.sqrt((H0*2*g)/(1+f*(Lt/D))),2)    # Velocidade inicial [m/s]
@@ -119,6 +119,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     envol_min = np.min(pressao, axis=0)     # Olha a matriz de pressões e seleciona o menor valor de cada ponto.
     coluna_v_final = vazao[:, Nx]           # Olha a matriz de vazões e seleciona a última coluna.
 
+    tabela_maximos.append([caso_simulado, np.max(pressao),np.min(pressao)])
 
     # --- CRIAÇÃO DA ANIMAÇÃO ---
     ## --- Gráfico da pressão ao longo da tubulação que será utilizado na animação ---
@@ -197,3 +198,25 @@ for i, tempo in enumerate(tempo_casos):
 
 print(f"\nTempo total: {sum(tempo_casos):.2f} s")
 print(f"Tempo médio por caso: {np.mean(tempo_casos):.2f} s")
+
+caminho_tempo = os.path.join(pasta_saida, "resumo_tempos_simulacao.txt")
+
+with open(caminho_tempo, "w", encoding="utf-8") as f:
+    f.write("Resumo dos tempos de simulação:\n\n")
+
+    for i, tempo in enumerate(tempo_casos):
+        f.write(f"Caso {i}: {tempo:.2f} s\n")
+
+    f.write(f"\nTempo total: {sum(tempo_casos):.2f} s\n")
+    f.write(f"Tempo médio por caso: {np.mean(tempo_casos):.2f} s\n")
+
+tabela_maximos = np.array(tabela_maximos)
+caminho_tabela = os.path.join(pasta_saida, "resumo_pressao.csv")
+np.savetxt(
+    caminho_tabela,
+    tabela_maximos,
+    delimiter=";",
+    header="caso,pressao_maxima,pressao_minima",
+    comments="",
+    fmt=["%d", "%.6f", "%.6f"]
+)
