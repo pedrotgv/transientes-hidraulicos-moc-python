@@ -11,20 +11,21 @@ os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráfico
 animacao = False     # Define se vai ser gerada a animação
 
 # --- CASOS SIMULADOS ---
-casos = [[1, 1, 1278.8, 0.5, 20],
-         [1, 0.15, 1379.5, 0.5, 20],
-         [1, 0.5, 1342.5, 0.5, 20],
-         [10, 1, 1278.8, 0.5, 20],
-         [0.1, 1, 1278.8, 0.5, 5],
-         [1, 1, 1278.8, 0.1, 20],
-         [1, 1, 1278.8, 2, 20],
-         [1, 1, 620.5, 0.5, 20],
-         [1, 0.5, 622.9, 0.5, 20],
+casos = [[1, 1,1118.8, 0.5, 20, 'Aço'],
+         [1, 0.1,1118.8, 0.5, 20,'Aço'],
+         [1, 0.5,1118.8, 0.5, 20,'Aço'],
+         [10, 1,1118.8, 0.5, 20,'Aço'],
+         [0.1, 1,1118.8, 0.5, 2,'Aço'],
+         [1, 1,1118.8, 0.1, 20,'Aço'],
+         [1, 1,1118.8, 2, 20,'Aço'],
+         [1, 1,294.7, 0.5, 20,'PVC'],
+         [1, 1,530.5, 0.5, 20,'PVC'],
 ]
 # Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
 tabela_maximos = []
+cota_terreno = 0
 
 for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     t_inicio = time.time()
@@ -39,6 +40,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     D = casos[caso_simulado][1]                     # Diâmetro Tubulação [m]
     c = casos[caso_simulado][2]                       # Celeridade Tubulação [m/s]
     TT = casos[caso_simulado][4]                    # Tempo total de simulação [s]
+    material = casos[caso_simulado][5]
 
     v0 = round(np.sqrt((H0*2*g)/(1+f*(Lt/D))),2)    # Velocidade inicial [m/s]
     A0 = np.pi * D**2 / 4                           # Área da seção Tubulação [m²]
@@ -64,7 +66,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     # --- MATRIZES DE RESULTADO ---
     pressao = np.zeros((Nt+1, Nx+1), dtype=np.float32)          # Matriz para armazenar os dados de pressão.
     vazao = np.zeros((Nt+1, Nx+1), dtype=np.float32)            # Matriz para armazenar os dados de vazão.
-    terreno =  np.ones(Nx+1) * 1000                             # Matriz que contém o valor da cota topográfica da tubulação.
+    terreno =  np.ones(Nx+1) * cota_terreno                     # Matriz que contém o valor da cota topográfica da tubulação.
 
 
     # --- ESTADO INICIAL --- 
@@ -116,6 +118,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     envol_max = np.max(pressao, axis=0)     # Olha a matriz de pressões e seleciona o maior valor de cada ponto.
     envol_min = np.min(pressao, axis=0)     # Olha a matriz de pressões e seleciona o menor valor de cada ponto.
     coluna_v_final = vazao[:, Nx]           # Olha a matriz de vazões e seleciona a última coluna.
+    coluna_m_pressao = pressao[:, pressao.shape[1] // 2] # Olha a matriz de pressão e seleciona a coluna do meio
 
     tabela_maximos.append([caso_simulado, np.max(pressao),np.min(pressao)])
 
@@ -141,7 +144,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     fig2, ax2 = plt.subplots(2, 1, figsize=(15, 20))
     fig2.suptitle(f"Caso {caso_simulado}", fontsize=18, y=0.98)
 
-    texto = f"Dx={Dx} m, Lx={Lt} m, D={D} m, f={f}, c={c} m/s, TF={round(TF/Tal,2)}τ s, H0={H0} m.c.a, V0={v0} m/s"
+    texto = f"Dx={Dx} m, Lx={Lt} m, D={D} m, f={f}, c={c} m/s, Material: {material} TF={round(TF/Tal,2)}τ s, H0={H0} m.c.a, V0={v0} m/s"
     fig2.text(0.5, 0.02, texto, ha='center', va='bottom', fontsize=12)
 
     ## --- Gráfico das envoltórias ---
@@ -154,13 +157,26 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     ax2[0].set_title("Envoltória de pressões")
     ax2[0].legend(loc='upper left', fontsize=10)
     ax2[0].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
-    ax2[0].text(Lt-200,terreno[0]-20, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', fontsize=10)
-
+    
+    ax2[0].text(0.02, 0.95, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', 
+                transform=ax2[0].transAxes, fontsize=10, verticalalignment='top', 
+                bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')
+                )
+    """
     ## --- Gráfico da vazão na válvula ---
     vazao_valv, = ax2[1].plot(tempo, coluna_v_final, color='b', label='Vazão')
     ax2[1].set_xlabel("Tempo (s)")
     ax2[1].set_ylabel("Vazão (m³/s)")
     ax2[1].set_title("Vazão na válvula")
+    ax2[1].legend(loc='upper left', fontsize=10)
+    ax2[1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
+    """
+    
+    ## --- Gráfico da pressão no meio da tubulação ---
+    pressao_meio, = ax2[1].plot(tempo, coluna_m_pressao, color='b', label='Pressão')
+    ax2[1].set_xlabel("Tempo (s)")
+    ax2[1].set_ylabel("Pressão (m.c.a.)")
+    ax2[1].set_title("Pressão no meio")
     ax2[1].legend(loc='upper left', fontsize=10)
     ax2[1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
 
