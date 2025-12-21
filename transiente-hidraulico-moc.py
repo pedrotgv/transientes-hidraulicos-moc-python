@@ -11,15 +11,15 @@ os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráfico
 animacao = False     # Define se vai ser gerada a animação
 
 # --- CASOS SIMULADOS ---
-casos = [[1, 1,1118.8, 0.5, 20, 'Aço'],
-         [1, 0.1,1118.8, 0.5, 20,'Aço'],
-         [1, 0.5,1118.8, 0.5, 20,'Aço'],
-         [10, 1,1118.8, 0.5, 20,'Aço'],
-         [0.1, 1,1118.8, 0.5, 2,'Aço'],
-         [1, 1,1118.8, 0.1, 20,'Aço'],
-         [1, 1,1118.8, 2, 20,'Aço'],
-         [1, 1,294.7, 0.5, 20,'PVC'],
-         [1, 1,530.5, 0.5, 20,'PVC'],
+casos = [[1, 1, 1278.8, 0.5, 20, 'Aço'],
+         [1, 0.1, 1379.5, 0.5, 20,'Aço'],
+         [1, 0.5, 1342.5, 0.5, 20,'Aço'],
+         [10, 1, 1278.8, 0.5, 20,'Aço'],
+         [0.1, 1, 1278.8, 0.5, 5,'Aço'],
+         [1, 1, 1278.8, 0.1, 20,'Aço'],
+         [1, 1, 1278.8, 2, 20,'Aço'],
+         [1, 1, 620.5, 0.5, 20,'PVC'],
+         [1, 1, 622.9, 0.5, 20,'PVC'],
 ]
 # Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
 
@@ -158,7 +158,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     ax2[0].legend(loc='upper left', fontsize=10)
     ax2[0].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
     
-    ax2[0].text(0.02, 0.95, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', 
+    ax2[0].text(0.02, 0.1, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', 
                 transform=ax2[0].transAxes, fontsize=10, verticalalignment='top', 
                 bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')
                 )
@@ -171,7 +171,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     ax2[1].legend(loc='upper left', fontsize=10)
     ax2[1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
     """
-    
+
     ## --- Gráfico da pressão no meio da tubulação ---
     pressao_meio, = ax2[1].plot(tempo, coluna_m_pressao, color='b', label='Pressão')
     ax2[1].set_xlabel("Tempo (s)")
