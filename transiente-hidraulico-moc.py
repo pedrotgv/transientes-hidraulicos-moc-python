@@ -47,13 +47,13 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     Q0 = v0 * A0                                    # Vazão inicial [m³/s]
 
     Dt = Dx / c                                     # Passo de tempo                  
-    Tal = 2 * Lt / c                                # Período da tubulação [s]
+    Tal = round(2 * Lt / c,2)                               # Período da tubulação [s]
     TF = casos[caso_simulado][3]*Tal                # Tempo fechamento Válvula [s]
 
 
     # --- COEFICIENTES DO MÉTODO DAS CARACTERÍSTICAS ---
-    Ca = (g * A0) / c
-    k = f * Dt / (2 * D * A0)
+    Ca = round((g * A0) / c,4)
+    k = round(f * Dt / (2 * D * A0),4)
 
 
     # --- DISCRETIZAÇÃO ---
@@ -144,7 +144,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     fig2, ax2 = plt.subplots(2, 1, figsize=(15, 20))
     fig2.suptitle(f"Caso {caso_simulado}", fontsize=18, y=0.98)
 
-    texto = f"Dx={Dx} m, Lx={Lt} m, D={D} m, f={f}, c={c} m/s, Material: {material} TF={round(TF/Tal,2)}τ s, H0={H0} m.c.a, V0={v0} m/s"
+    texto = f"Dx={Dx} m, Lx={Lt} m, D={D} m, f={f}, c={c} m/s, Material: {material} TF={round(TF/Tal,2)}τ ({round(TF,2)}s), H0={H0} m.c.a, V0={v0} m/s"
     fig2.text(0.5, 0.02, texto, ha='center', va='bottom', fontsize=12)
 
     ## --- Gráfico das envoltórias ---

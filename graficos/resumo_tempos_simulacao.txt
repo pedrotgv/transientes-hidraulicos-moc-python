@@ -1,14 +1,14 @@
 Resumo dos tempos de simulação:
 
-Caso 0: 206.14 s
-Caso 1: 297.17 s
-Caso 2: 226.79 s
-Caso 3: 5399.89 s
-Caso 4: 4.19 s
-Caso 5: 201.60 s
-Caso 6: 201.88 s
-Caso 7: 98.15 s
-Caso 8: 100.27 s
+Caso 0: 92.95 s
+Caso 1: 94.74 s
+Caso 2: 91.66 s
+Caso 3: 2211.61 s
+Caso 4: 2.21 s
+Caso 5: 87.89 s
+Caso 6: 87.45 s
+Caso 7: 43.02 s
+Caso 8: 43.22 s
 
-Tempo total: 6736.07 s
-Tempo médio por caso: 748.45 s
+Tempo total: 2754.76 s
+Tempo médio por caso: 306.08 s
