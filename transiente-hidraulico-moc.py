@@ -11,15 +11,15 @@ os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráfico
 animacao = False     # Define se vai ser gerada a animação
 
 # --- CASOS SIMULADOS ---
-casos = [[1, 1, 1278.8, 0.5, 20, 'Aço'],
-         [1, 0.15, 1379.5, 0.5, 20,'Aço'],
-         [1, 0.5, 1342.5, 0.5, 20,'Aço'],
-         [0.1, 1, 1278.8, 0.5, 5,'Aço'],
-         [10, 1, 1278.8, 0.5, 20,'Aço'],
-         [1, 1, 1278.8, 0.1, 20,'Aço'],
-         [1, 1, 1278.8, 2, 20,'Aço'],
-         [1, 1, 620.5, 0.5, 20,'PVC'],
-         [1, 0.5, 622.9, 0.5, 20,'PVC'],
+casos = [[1, 1, 1278.084, 0.5, 20, 'Aço'],
+         [1, 0.15, 1381.964, 0.5, 20,'Aço'],
+         [1, 0.5, 1330.808, 0.5, 20,'Aço'],
+         [0.1, 1, 1278.084, 0.5, 5,'Aço'],
+         [10, 1, 1278.084, 0.5, 20,'Aço'],
+         [1, 1, 1278.084, 0.1, 20,'Aço'],
+         [1, 1, 1278.084, 2, 20,'Aço'],
+         [1, 1, 606.841, 0.5, 20,'PVC'],
+         [1, 0.5, 609.923, 0.5, 20,'PVC'],
 ]
 # Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
 
