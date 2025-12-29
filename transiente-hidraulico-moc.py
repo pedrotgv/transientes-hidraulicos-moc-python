@@ -4,12 +4,14 @@ from matplotlib.animation import FuncAnimation
 import os
 from tqdm import tqdm
 import time
+from casos import casos
 
 
 pasta_saida = "graficos"    # Cria o nome da pasta para salvar gráficos e animações
 os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráficos e animações
 animacao = False     # Define se vai ser gerada a animação
 
+"""
 # --- CASOS SIMULADOS ---
 casos = [[1, 1, 1278.084, 0.5, 20, 'Aço'],
          [1, 0.15, 1381.964, 0.5, 20,'Aço'],
@@ -21,6 +23,7 @@ casos = [[1, 1, 1278.084, 0.5, 20, 'Aço'],
          [1, 1, 606.841, 0.5, 20,'PVC'],
          [1, 0.5, 609.923, 0.5, 20,'PVC'],
 ]
+"""
 # Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
