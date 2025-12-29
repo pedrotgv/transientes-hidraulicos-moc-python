@@ -52,8 +52,8 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
 
 
     # --- COEFICIENTES DO MÉTODO DAS CARACTERÍSTICAS ---
-    Ca = round((g * A0) / c,6)
-    k = round(f * Dt / (2 * D * A0),6)
+    Ca = round((g * A0) / c,5)
+    k = round(f * Dt / (2 * D * A0),5)
 
 
     # --- DISCRETIZAÇÃO ---
