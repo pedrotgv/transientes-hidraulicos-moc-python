@@ -4,33 +4,32 @@ from matplotlib.animation import FuncAnimation
 import os
 from tqdm import tqdm
 import time
-from casos import casos
 
 
 pasta_saida = "graficos_slicing"    # Cria o nome da pasta para salvar gráficos e animações
 os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráficos e animações
 animacao = False     # Define se vai ser gerada a animação
-"""
-# --- CASOS SIMULADOS ---
-casos = [[1, 1, 1278.084, 0.5, 20, 'Aço'],
-         [1, 0.15, 1381.964, 0.5, 20,'Aço'],
-         [1, 0.5, 1330.808, 0.5, 20,'Aço'],
-         [0.1, 1, 1278.084, 0.5, 5,'Aço'],
-         [10, 1, 1278.084, 0.5, 20,'Aço'],
-         [1, 1, 1278.084, 0.1, 20,'Aço'],
-         [1, 1, 1278.084, 2, 20,'Aço'],
-         [1, 1, 606.841, 0.5, 20,'PVC'],
-         [1, 0.5, 609.923, 0.5, 20,'PVC'],
+
+casos = [[1, 1, 1278.084, 0.5, 60, 'Aço'],
+         [1, 0.15, 1382.015, 0.5, 60,'Aço'],
+         [1, 0.5, 1330.808, 0.5, 60,'Aço'],
+         [0.1, 1, 1278.084, 0.5, 20,'Aço'],
+         [10, 1, 1278.084, 0.5, 60,'Aço'],
+         [1, 1, 1278.084, 0.1, 60,'Aço'],
+         [1, 1, 1278.084, 2, 60,'Aço'],
+         [1, 1, 606.894, 0.5, 60,'PVC'],
+         [1, 0.5, 609.996, 0.5, 60,'PVC'],
 ]
-"""
-# Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
+
+# Define os casos simulados, na ordem: Dx, D, c, TF, TT, Material
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
-tabela_maximos = []
-cota_terreno = 0
+tabela_maximos = []     # Cria uma tabela para armazenar os valores de máximos e mínimos de cada simulação
+cota_terreno = 0     # Define uma cota para a tubulação horizontal
 
-for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
-    t_inicio = time.time()
+for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inicia a simulação de cada caso, gerenciando o tempo de simulação
+
+    t_inicio = time.time()    # Inicia o monitoramento de tempo da simulação total
 
     # --- DADOS SIMULAÇÃO ---
     Lt = 1000                  # Comprimento da tubulação [m]
@@ -49,8 +48,8 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
     Q0 = v0 * A0                                    # Vazão inicial [m³/s]
 
     Dt = Dx / c                                     # Passo de tempo                  
-    Tal = round(2 * Lt / c,2)                               # Período da tubulação [s]
-    TF = casos[caso_simulado][3]*Tal                # Tempo fechamento Válvula [s]
+    Tal = 2 * Lt / c                                # Período da tubulação [s]
+    TF = casos[caso_simulado][3]*Tal                # Tempo fechamento Válvula [s] (Uma fração do período)
 
 
     # --- COEFICIENTES DO MÉTODO DAS CARACTERÍSTICAS ---
@@ -80,34 +79,48 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
 
                 
         # ---  SIMULAÇÃO (Vetorizada) --- 
-    for t in tqdm(range(1, Nt+1), desc=f"Caso {caso_simulado} – tempo", leave=False):
+    for t in tqdm(range(1, Nt+1), desc=f"Caso {caso_simulado} – tempo", leave=False):     # Inicia a simulaçao olhando para cada tempo
                 
-        tempo.append(t*Dt)
+        tempo.append(t*Dt)     # Insere o valor do tempo em uma tabela para gerar os gráficos      
 
         # ---------------------------------------------------------
         # 1. PONTOS INTERNOS (Cálculo simultâneo de i=1 até Nx-1)
         # ---------------------------------------------------------
         
-        # Fatiamento (Slicing):
-        # Queremos calcular os pontos do índice 1 até o penúltimo.
-        # Para i, o vizinho da esquerda (i-1) está nos índices [0 : -2]
-        # Para i, o vizinho da direita (i+1) está nos índices [2 : até o fim]
+        # Fatiamento dos vizinhos anteriores
+        Q_esq = vazao[t-1, 0:-2]  # Vizinho i-1 (Q_A)
+        P_esq = pressao[t-1, 0:-2]
         
-       # --- Cálculo dos Pontos Internos com Atrito Implícito ---
+        Q_dir = vazao[t-1, 2:]    # Vizinho i+1 (Q_B)
+        P_dir = pressao[t-1, 2:]
         
-        # 1. Calculamos Cp e Cn SEM o termo de atrito final
-        Cp_linear = vazao[t-1, 0:-2] + Ca * pressao[t-1, 0:-2]
-        Cn_linear = vazao[t-1, 2:] - Ca * pressao[t-1, 2:]
+        # --- Método das Características com Linearização do Atrito (Wylie & Streeter) ---
         
-        # 2. Coeficiente de resistência baseado na vazão anterior (para linearizar)
-        # O termo de atrito agora será (1 + k * |vazão_anterior|) no denominador
-        resist_esq = k * np.abs(vazao[t-1, 0:-2])
-        resist_dir = k * np.abs(vazao[t-1, 2:])
-
-        # 3. Novas fórmulas de Vazão e Pressão (Estáveis)
-        # Note que o atrito agora divide a equação, impedindo o crescimento infinito
-        vazao[t, 1:-1] = (Cp_linear / (1 + resist_esq) + Cn_linear / (1 + resist_dir)) / 2
-        pressao[t, 1:-1] = ( (Cp_linear / (1 + resist_esq)) - (Cn_linear / (1 + resist_dir)) ) / (2 * Ca)
+        # Calculamos Cp e Cn APENAS com a parte linear (sem subtrair atrito ainda)
+        # Lembre-se: Ca = g*A/a. Nas equações padrão MOC: Cp = Q + (gA/a)*H
+        Cp_base = Q_esq + Ca * P_esq
+        Cn_base = Q_dir - Ca * P_dir
+        
+        # Fator de amortecimento devido ao atrito (O Denominador Mágico)
+        # k = f * dt / (2 * D * A)
+        # O termo de atrito atua nas duas características chegando ao ponto P.
+        # Somamos a resistência vinda da esquerda e da direita.
+        fator_atrito = 1 + k * (np.abs(Q_esq) + np.abs(Q_dir))
+        
+        # Cálculo final da Vazão (Qp) com o denominador
+        vazao[t, 1:-1] = (Cp_base + Cn_base) / (2 * fator_atrito)
+        
+        # Cálculo da Pressão (Hp)
+        # Recuperamos Hp substituindo o Qp encontrado em uma das equações de compatibilidade
+        # Hp = (Cp_base - Qp*(1 + k*|Q_esq|)) / Ca ... mas podemos simplificar pela média:
+        pressao[t, 1:-1] = (Cp_base - Cn_base) / (2 * Ca) 
+        
+        # Nota: A equação de pressão acima é uma simplificação válida se o termo de atrito 
+        # for distribuído simetricamente, o que é verdade para tubos uniformes.
+        # Se quiser a precisão exata do método de Wylie Streeter para a pressão também:
+        # termo_atrito_esq = k * np.abs(Q_esq) * vazao[t, 1:-1]
+        # termo_atrito_dir = k * np.abs(Q_dir) * vazao[t, 1:-1]
+        # pressao[t, 1:-1] = ( (Cp_base - termo_atrito_esq) - (Cn_base + termo_atrito_dir) ) / (2*Ca)
 
         # ---------------------------------------------------------
         # 2. CONDIÇÕES DE CONTORNO (Reservatório e Válvula)
@@ -134,10 +147,10 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
         pressao[t, -1] = (cp_valv - vazao[t, -1]) / Ca
 
     # --- SELECIONA DADOS DE INTERESSE ---
-    envol_max = np.max(pressao, axis=0)     # Olha a matriz de pressões e seleciona o maior valor de cada ponto.
-    envol_min = np.min(pressao, axis=0)     # Olha a matriz de pressões e seleciona o menor valor de cada ponto.
-    coluna_v_final = vazao[:, Nx]           # Olha a matriz de vazões e seleciona a última coluna.
-    coluna_m_pressao = pressao[:, pressao.shape[1] // 2] # Olha a matriz de pressão e seleciona a coluna do meio
+    envol_max = np.max(pressao, axis=0)                    # Olha a matriz de pressões e seleciona o maior valor de cada ponto.
+    envol_min = np.min(pressao, axis=0)                    # Olha a matriz de pressões e seleciona o menor valor de cada ponto.
+    coluna_v_final = vazao[:, Nx]                          # Olha a matriz de vazões e seleciona a última coluna.
+    coluna_m_pressao = pressao[:, pressao.shape[1] // 2]   # Olha a matriz de pressão e seleciona a coluna do meio
 
     tabela_maximos.append([caso_simulado, np.max(pressao),np.min(pressao)])
 

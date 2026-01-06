@@ -4,27 +4,23 @@ from matplotlib.animation import FuncAnimation
 import os
 from tqdm import tqdm
 import time
-from casos import casos
+
 
 
 pasta_saida = "graficos"    # Cria o nome da pasta para salvar gráficos e animações
 os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráficos e animações
 animacao = False     # Define se vai ser gerada a animação
 
-"""
-# --- CASOS SIMULADOS ---
-casos = [[1, 1, 1278.084, 0.5, 20, 'Aço'],
-         [1, 0.15, 1381.964, 0.5, 20,'Aço'],
-         [1, 0.5, 1330.808, 0.5, 20,'Aço'],
-         [0.1, 1, 1278.084, 0.5, 5,'Aço'],
-         [10, 1, 1278.084, 0.5, 20,'Aço'],
-         [1, 1, 1278.084, 0.1, 20,'Aço'],
-         [1, 1, 1278.084, 2, 20,'Aço'],
-         [1, 1, 606.841, 0.5, 20,'PVC'],
-         [1, 0.5, 609.923, 0.5, 20,'PVC'],
+casos = [[1, 1, 1278.084, 0.5, 60, 'Aço'],
+         [1, 0.15, 1382.015, 0.5, 60,'Aço'],
+         [1, 0.5, 1330.808, 0.5, 60,'Aço'],
+         [0.1, 1, 1278.084, 0.5, 60,'Aço'],
+         [10, 1, 1278.084, 0.5, 60,'Aço'],
+         [1, 1, 1278.084, 0.1, 60,'Aço'],
+         [1, 1, 1278.084, 2, 60,'Aço'],
+         [1, 1, 606.894, 0.5, 60,'PVC'],
+         [1, 0.5, 609.996, 0.5, 60,'PVC'],
 ]
-"""
-# Essa é a matriz com os dados de todos os casos simulados, na ordem: Dx, D, Material (c) , Tal, Tempo de simulação
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
 tabela_maximos = []
@@ -115,7 +111,6 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):
 
                 pressao[t, i] = (cp - cn) / (2*Ca)    # Pressão é calculada com base nas equações do método das características eq
                 vazao[t, i] = (cp + cn) / 2           # Vazão é calculada com base nas equações do método das características eq
-
 
     # --- SELECIONA DADOS DE INTERESSE ---
     envol_max = np.max(pressao, axis=0)     # Olha a matriz de pressões e seleciona o maior valor de cada ponto.
