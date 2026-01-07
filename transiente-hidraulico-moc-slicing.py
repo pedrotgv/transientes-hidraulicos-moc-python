@@ -10,6 +10,8 @@ pasta_saida = "graficos_slicing"    # Cria o nome da pasta para salvar gráficos
 os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráficos e animações
 animacao = False     # Define se vai ser gerada a animação
 
+
+# Define os casos simulados, na ordem: Dx, D, c, TF, TT, Material
 casos = [[1, 1, 1278.084, 0.5, 60, 'Aço'],
          [1, 0.15, 1382.015, 0.5, 60,'Aço'],
          [1, 0.5, 1330.808, 0.5, 60,'Aço'],
@@ -21,11 +23,11 @@ casos = [[1, 1, 1278.084, 0.5, 60, 'Aço'],
          [1, 0.5, 609.996, 0.5, 60,'PVC'],
 ]
 
-# Define os casos simulados, na ordem: Dx, D, c, TF, TT, Material
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
 tabela_maximos = []     # Cria uma tabela para armazenar os valores de máximos e mínimos de cada simulação
 cota_terreno = 0     # Define uma cota para a tubulação horizontal
+
 
 for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inicia a simulação de cada caso, gerenciando o tempo de simulação
 
@@ -94,33 +96,17 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
         Q_dir = vazao[t-1, 2:]    # Vizinho i+1 (Q_B)
         P_dir = pressao[t-1, 2:]
         
-        # --- Método das Características com Linearização do Atrito (Wylie & Streeter) ---
+        # --- Método das Características com Linearização do Atrito
+        Cp = Q_esq + Ca * P_esq
+        Cn = Q_dir - Ca * P_dir
         
-        # Calculamos Cp e Cn APENAS com a parte linear (sem subtrair atrito ainda)
-        # Lembre-se: Ca = g*A/a. Nas equações padrão MOC: Cp = Q + (gA/a)*H
-        Cp_base = Q_esq + Ca * P_esq
-        Cn_base = Q_dir - Ca * P_dir
-        
-        # Fator de amortecimento devido ao atrito (O Denominador Mágico)
-        # k = f * dt / (2 * D * A)
-        # O termo de atrito atua nas duas características chegando ao ponto P.
-        # Somamos a resistência vinda da esquerda e da direita.
-        fator_atrito = 1 + k * (np.abs(Q_esq) + np.abs(Q_dir))
+        fator_atrito =  k * (np.abs(Q_esq) + np.abs(Q_dir))
         
         # Cálculo final da Vazão (Qp) com o denominador
-        vazao[t, 1:-1] = (Cp_base + Cn_base) / (2 * fator_atrito)
+        vazao[t, 1:-1] = (Cp + Cn) / (2 + fator_atrito)
         
         # Cálculo da Pressão (Hp)
-        # Recuperamos Hp substituindo o Qp encontrado em uma das equações de compatibilidade
-        # Hp = (Cp_base - Qp*(1 + k*|Q_esq|)) / Ca ... mas podemos simplificar pela média:
-        pressao[t, 1:-1] = (Cp_base - Cn_base) / (2 * Ca) 
-        
-        # Nota: A equação de pressão acima é uma simplificação válida se o termo de atrito 
-        # for distribuído simetricamente, o que é verdade para tubos uniformes.
-        # Se quiser a precisão exata do método de Wylie Streeter para a pressão também:
-        # termo_atrito_esq = k * np.abs(Q_esq) * vazao[t, 1:-1]
-        # termo_atrito_dir = k * np.abs(Q_dir) * vazao[t, 1:-1]
-        # pressao[t, 1:-1] = ( (Cp_base - termo_atrito_esq) - (Cn_base + termo_atrito_dir) ) / (2*Ca)
+        pressao[t, 1:-1] = (Cp - Cn) / (2 * Ca) 
 
         # ---------------------------------------------------------
         # 2. CONDIÇÕES DE CONTORNO (Reservatório e Válvula)
@@ -135,7 +121,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
 
         # --- VÁLVULA (i = Nx, ou índice -1) ---
         # Usa o vizinho i-1 (índice -2) do tempo anterior
-        cp_valv = vazao[t-1, -2] + Ca * pressao[t-1, -2] + k * vazao[t-1, -2] * abs(vazao[t-1, -2])
+        Cp_valv = vazao[t-1, -2] + Ca * pressao[t-1, -2] + k * vazao[t-1, -2] * abs(vazao[t-1, -2])
 
         vazao_tempo = v0 * (A0 - (t*Dt)*(A0/TF))   # Verifica o estado de fechamento
 
@@ -144,7 +130,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
         else:
             vazao[t, -1] = 0
 
-        pressao[t, -1] = (cp_valv - vazao[t, -1]) / Ca
+        pressao[t, -1] = (Cp_valv - vazao[t, -1]) / Ca
 
     # --- SELECIONA DADOS DE INTERESSE ---
     envol_max = np.max(pressao, axis=0)                    # Olha a matriz de pressões e seleciona o maior valor de cada ponto.
