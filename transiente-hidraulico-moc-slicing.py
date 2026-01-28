@@ -15,7 +15,7 @@ animacao = False     # Define se vai ser gerada a animação
 casos = [ [1, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
          [1, 155.1, 5 , 0.5, 0.5, 60,'Aço'],
          [1, 52.8, 3.75, 0.5, 0.5, 60,'Aço'],
-         [0.1, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
+         [0.1, 105.3, 4.5, 0.5, 0.5, 20, 'Aço'],
          [10, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
          [1, 105.3, 4.5, 0.5, 0.1, 60, 'Aço'],
          [1, 105.3, 4.5, 0.5, 2, 60, 'Aço'],
@@ -40,7 +40,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
     H0 = 10                    # Nível do reservatório [m]
 
     Dx = casos[caso_simulado][0]                    # Discretização espacial [m]
-    D = casos[caso_simulado][1]/1000                     # Diâmetro Tubulação [m]
+    D = round(casos[caso_simulado][1]/1000,2)                     # Diâmetro Tubulação [m]
 
     c = 9900/np.sqrt(48.3+(casos[caso_simulado][3]*(casos[caso_simulado][1]/casos[caso_simulado][2])))  # Celeridade Tubulação [m/s]
 
@@ -162,7 +162,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
 
     # --- CRIAÇÃO DOS GRÁFICOS ---
     fig2, ax2 = plt.subplots(2, 1, figsize=(15, 20))
-    fig2.suptitle(f"Caso {caso_simulado}", fontsize=18, y=0.98)
+    fig2.suptitle(f"Caso {caso_simulado}", fontsize=18, y=0.92)
 
     texto = f"Dx={Dx} m, Lx={Lt} m, Di={D} m, f={f}, c={round(c,2)} m/s, Material: {material} TF={round(TF/Tal,2)}τ ({round(TF,2)}s), H0={H0} m.c.a, V0={v0} m/s"
     fig2.text(0.5, 0.02, texto, ha='center', va='bottom', fontsize=12)
@@ -174,7 +174,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
     linha_terreno, = ax2[0].plot(x, terreno, color='k', label='Tubulação', linestyle='--', alpha=0.8)
     ax2[0].set_xlabel("Comprimento (m)")
     ax2[0].set_ylabel("Pressão (m.c.a)")
-    ax2[0].set_title("Envoltória de pressões")
+    ax2[0].set_title("Envoltória de pressões (a)")
     ax2[0].legend(loc='upper left', fontsize=10)
     ax2[0].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
     
@@ -196,7 +196,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
     pressao_meio, = ax2[1].plot(tempo, coluna_m_pressao, color='b', label='Pressão')
     ax2[1].set_xlabel("Tempo (s)")
     ax2[1].set_ylabel("Pressão (m.c.a.)")
-    ax2[1].set_title("Pressão no meio")
+    ax2[1].set_title("Pressão no meio (b)")
     ax2[1].legend(loc='upper left', fontsize=10)
     ax2[1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
 
