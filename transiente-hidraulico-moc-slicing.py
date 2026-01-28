@@ -11,18 +11,18 @@ os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráfico
 animacao = False     # Define se vai ser gerada a animação
 
 
-# Define os casos simulados, na ordem: Dx, D, c, TF, TT, Material
-casos = [[1, 1, 1278.084, 0.5, 60, 'Aço'],
-         [1, 0.15, 1382.015, 0.5, 60,'Aço'],
-         [1, 0.5, 1330.808, 0.5, 60,'Aço'],
-         [0.1, 1, 1278.084, 0.5, 20,'Aço'],
-         [10, 1, 1278.084, 0.5, 60,'Aço'],
-         [1, 1, 1278.084, 0.1, 60,'Aço'],
-         [1, 1, 1278.084, 2, 60,'Aço'],
-         [1, 1, 606.894, 0.5, 60,'PVC'],
-         [1, 0.5, 609.996, 0.5, 60,'PVC'],
+# Define os casos simulados, na ordem: [0]Dx (m), [1]Di (mm), [2]e(mm), [3]kt, [4]TF(s), [5]TT(s), [6]Material
+casos = [ [1, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
+         [1, 155.1, 5 , 0.5, 0.5, 60,'Aço'],
+         [1, 52.8, 3.75, 0.5, 0.5, 60,'Aço'],
+         [0.1, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
+         [10, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
+         [1, 105.3, 4.5, 0.5, 0.1, 60, 'Aço'],
+         [1, 105.3, 4.5, 0.5, 2, 60, 'Aço'],
+         [1, 94.4, 7.8, 18, 0.5, 60,'PVC'],
+         [1, 72.8, 6.1, 18, 0.5, 60,'PVC'],
+         [1, 51.4, 4.3, 18, 0.5, 60,'PVC'],
 ]
-
 
 tempo_casos = []    # Matriz para simular o tempo dos casos
 tabela_maximos = []     # Cria uma tabela para armazenar os valores de máximos e mínimos de cada simulação
@@ -40,10 +40,12 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
     H0 = 10                    # Nível do reservatório [m]
 
     Dx = casos[caso_simulado][0]                    # Discretização espacial [m]
-    D = casos[caso_simulado][1]                     # Diâmetro Tubulação [m]
-    c = casos[caso_simulado][2]                     # Celeridade Tubulação [m/s]
-    TT = casos[caso_simulado][4]                    # Tempo total de simulação [s]
-    material = casos[caso_simulado][5]
+    D = casos[caso_simulado][1]/1000                     # Diâmetro Tubulação [m]
+
+    c = 9900/np.sqrt(48.3+(casos[caso_simulado][3]*(casos[caso_simulado][1]/casos[caso_simulado][2])))  # Celeridade Tubulação [m/s]
+
+    TT = casos[caso_simulado][5]                    # Tempo total de simulação [s]
+    material = casos[caso_simulado][6]
 
     v0 = round(np.sqrt((H0*2*g)/(1+f*(Lt/D))),2)    # Velocidade inicial [m/s]
     A0 = np.pi * D**2 / 4                           # Área da seção Tubulação [m²]
@@ -51,7 +53,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
 
     Dt = Dx / c                                     # Passo de tempo                  
     Tal = 2 * Lt / c                                # Período da tubulação [s]
-    TF = casos[caso_simulado][3]*Tal                # Tempo fechamento Válvula [s] (Uma fração do período)
+    TF = casos[caso_simulado][4]*Tal                # Tempo fechamento Válvula [s] (Uma fração do período)
 
 
     # --- COEFICIENTES DO MÉTODO DAS CARACTERÍSTICAS ---
@@ -162,7 +164,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
     fig2, ax2 = plt.subplots(2, 1, figsize=(15, 20))
     fig2.suptitle(f"Caso {caso_simulado}", fontsize=18, y=0.98)
 
-    texto = f"Dx={Dx} m, Lx={Lt} m, D={D} m, f={f}, c={c} m/s, Material: {material} TF={round(TF/Tal,2)}τ ({round(TF,2)}s), H0={H0} m.c.a, V0={v0} m/s"
+    texto = f"Dx={Dx} m, Lx={Lt} m, Di={D} m, f={f}, c={round(c,2)} m/s, Material: {material} TF={round(TF/Tal,2)}τ ({round(TF,2)}s), H0={H0} m.c.a, V0={v0} m/s"
     fig2.text(0.5, 0.02, texto, ha='center', va='bottom', fontsize=12)
 
     ## --- Gráfico das envoltórias ---
