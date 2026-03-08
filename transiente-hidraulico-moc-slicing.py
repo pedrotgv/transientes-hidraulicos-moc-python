@@ -159,11 +159,11 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
 
 
     # --- GRÁFICOS ---
-    fig_a, ax_a = plt.subplots(figsize=(25, 20))
+    fig_a, ax_a = plt.subplots(figsize=(20, 12))
     texto_1 = f"Dx={Dx}m, Lx={Lt}m, Di={round(casos[caso_simulado][1]/1000,4)}m, f={f}, c={round(c,2)}m/s"
-    fig_a.text(0.5, 0.02, texto_1, ha='center', va='bottom', fontsize=30)
+    fig_a.text(0.5, 0.0, texto_1, ha='center', va='bottom', fontsize=25)
     texto_2 = f"Material: {material} TF={round(TF/Tal,2)}τ ({round(TF,2)}s), H0={H0}m.c.a, V0={v0}m/s, M({Nt}x{Nx})"
-    fig_a.text(0.5, 0.0, texto_2, ha='center', va='bottom', fontsize=30)
+    fig_a.text(0.5, -0.03, texto_2, ha='center', va='bottom', fontsize=25)
 
     ## --- Gráfico das envoltórias ---
     envolt_max = ax_a.plot(x, envol_max+terreno, color="r", label='Pressão máxima')
@@ -183,7 +183,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
                 )
 
     ## --- Gráfico da pressão no meio da tubulação ---
-    fig_b, ax_b = plt.subplots(figsize=(30, 20))
+    fig_b, ax_b = plt.subplots(figsize=(20, 12))
     pressao_meio, = ax_b.plot(tempo, coluna_m_pressao, color='b', label='Pressão')
     ax_b.set_xlabel("Tempo (s)",fontsize=30)
     ax_b.set_ylabel("Pressão (m.c.a.)", fontsize=30)
