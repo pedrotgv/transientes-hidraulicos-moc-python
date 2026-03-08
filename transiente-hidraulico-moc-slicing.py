@@ -6,10 +6,9 @@ from tqdm import tqdm
 import time
 
 
-pasta_saida = "graficos_slicing"    # Cria o nome da pasta para salvar gráficos e animações
+pasta_saida = "graficos_slicing"             # Cria o nome da pasta para salvar gráficos e animações
 os.makedirs(pasta_saida, exist_ok=True)      # Cria a pasta para salvar gráficos e animações
-animacao = False     # Define se vai ser gerada a animação
-
+animacao = False                             # Define se vai ser gerada a animação
 
 # Define os casos simulados, na ordem: [0]Dx (m), [1]Di (mm), [2]e(mm), [3]kt, [4]TF(s), [5]TT(s), [6]Material
 casos = [ [1, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
@@ -24,10 +23,9 @@ casos = [ [1, 105.3, 4.5, 0.5, 0.5, 60, 'Aço'],
          [1, 51.4, 4.3, 18, 0.5, 60,'PVC'],
 ]
 
-tempo_casos = []    # Matriz para simular o tempo dos casos
-tabela_maximos = []     # Cria uma tabela para armazenar os valores de máximos e mínimos de cada simulação
-cota_terreno = 0     # Define uma cota para a tubulação horizontal
-
+tempo_casos = []        # Matriz para simular o tempo dos casos
+tabela_maximos = []     # Tabela para armazenar os valores de máximos e mínimos de cada simulação
+cota_terreno = 0        # Define uma cota para a tubulação horizontal
 
 for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inicia a simulação de cada caso, gerenciando o tempo de simulação
 
@@ -40,12 +38,12 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
     H0 = 10                    # Nível do reservatório [m]
 
     Dx = casos[caso_simulado][0]                    # Discretização espacial [m]
-    D = round(casos[caso_simulado][1]/1000,2)                     # Diâmetro Tubulação [m]
+    D = round(casos[caso_simulado][1]/1000,2)       # Diâmetro Tubulação [m]
 
     c = 9900/np.sqrt(48.3+(casos[caso_simulado][3]*(casos[caso_simulado][1]/casos[caso_simulado][2])))  # Celeridade Tubulação [m/s]
 
     TT = casos[caso_simulado][5]                    # Tempo total de simulação [s]
-    material = casos[caso_simulado][6]
+    material = casos[caso_simulado][6]              # Nome do material
 
     v0 = round(np.sqrt((H0*2*g)/(1+f*(Lt/D))),2)    # Velocidade inicial [m/s]
     A0 = np.pi * D**2 / 4                           # Área da seção Tubulação [m²]
@@ -135,10 +133,10 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
         pressao[t, -1] = (Cp_valv - vazao[t, -1]) / Ca
 
     # --- SELECIONA DADOS DE INTERESSE ---
-    envol_max = np.max(pressao, axis=0)                    # Olha a matriz de pressões e seleciona o maior valor de cada ponto.
-    envol_min = np.min(pressao, axis=0)                    # Olha a matriz de pressões e seleciona o menor valor de cada ponto.
-    coluna_v_final = vazao[:, Nx]                          # Olha a matriz de vazões e seleciona a última coluna.
-    coluna_m_pressao = pressao[:, pressao.shape[1] // 2]   # Olha a matriz de pressão e seleciona a coluna do meio
+    envol_max = np.max(pressao, axis=0)                    # Matriz de pressões com o maior valor de cada ponto.
+    envol_min = np.min(pressao, axis=0)                    # Matriz de pressões com o menor valor de cada ponto.
+    coluna_v_final = vazao[:, Nx]                          # Última coluna da matriz de vazão.
+    coluna_m_pressao = pressao[:, pressao.shape[1] // 2]   # Coluna do meio da matriz de vazão
 
     tabela_maximos.append([caso_simulado, np.max(pressao),np.min(pressao)])
 
@@ -160,45 +158,40 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
         ax1.grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
 
 
-    # --- CRIAÇÃO DOS GRÁFICOS ---
-    fig2, ax2 = plt.subplots(2, 1, figsize=(15, 20))
-    fig2.suptitle(f"Caso {caso_simulado}", fontsize=18, y=0.92)
-
-    texto = f"Dx={Dx} m, Lx={Lt} m, Di={D} m, f={f}, c={round(c,2)} m/s, Material: {material} TF={round(TF/Tal,2)}τ ({round(TF,2)}s), H0={H0} m.c.a, V0={v0} m/s, M({Nt}x{Nx})"
-    fig2.text(0.5, 0.02, texto, ha='center', va='bottom', fontsize=12)
+    # --- GRÁFICOS ---
+    fig_a, ax_a = plt.subplots(figsize=(25, 20))
+    texto_1 = f"Dx={Dx}m, Lx={Lt}m, Di={round(casos[caso_simulado][1]/1000,4)}m, f={f}, c={round(c,2)}m/s"
+    fig_a.text(0.5, 0.02, texto_1, ha='center', va='bottom', fontsize=30)
+    texto_2 = f"Material: {material} TF={round(TF/Tal,2)}τ ({round(TF,2)}s), H0={H0}m.c.a, V0={v0}m/s, M({Nt}x{Nx})"
+    fig_a.text(0.5, 0.0, texto_2, ha='center', va='bottom', fontsize=30)
 
     ## --- Gráfico das envoltórias ---
-    envolt_max = ax2[0].plot(x, envol_max+terreno, color="r", label='Pressão máxima')
-    envolt_min = ax2[0].plot(x, envol_min+terreno, color="b", label='Pressão mínima')
-    ax2[0].fill_between(x, envol_min + terreno, envol_max + terreno, color='lightgray', alpha=0.6, label='Envoltória')
-    linha_terreno, = ax2[0].plot(x, terreno, color='k', label='Tubulação', linestyle='--', alpha=0.8)
-    ax2[0].set_xlabel("Comprimento (m)")
-    ax2[0].set_ylabel("Pressão (m.c.a)")
-    ax2[0].set_title("Envoltória de pressões (a)")
-    ax2[0].legend(loc='upper left', fontsize=10)
-    ax2[0].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
-    
-    ax2[0].text(0.02, 0.1, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', 
-                transform=ax2[0].transAxes, fontsize=10, verticalalignment='top', 
+    envolt_max = ax_a.plot(x, envol_max+terreno, color="r", label='Pressão máxima')
+    envolt_min = ax_a.plot(x, envol_min+terreno, color="b", label='Pressão mínima')
+    ax_a.fill_between(x, envol_min + terreno, envol_max + terreno, color='lightgray', alpha=0.6, label='Envoltória')
+    linha_terreno, = ax_a.plot(x, terreno, color='k', label='Tubulação', linestyle='--', alpha=0.8)
+    ax_a.set_xlabel("Comprimento (m)", fontsize=30)
+    ax_a.set_ylabel("Pressão (m.c.a)", fontsize=30)
+    ax_a.set_xlim(0, Lt)
+    ax_a.set_ylim(-140, 170)
+    #ax_a.set_aspect('equal') # Se quiser que o gráfico possua a mesma escala no eixo x e y
+    ax_a.tick_params(axis='both', labelsize=25)
+    ax_a.grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
+    ax_a.text(0.02, 0.2, f'Máximo = {np.max(pressao):.2f}\nMínimo = {np.min(pressao):.2f}', 
+                transform=ax_a.transAxes, fontsize=25, verticalalignment='top', 
                 bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')
                 )
-    """
-    ## --- Gráfico da vazão na válvula ---
-    vazao_valv, = ax2[1].plot(tempo, coluna_v_final, color='b', label='Vazão')
-    ax2[1].set_xlabel("Tempo (s)")
-    ax2[1].set_ylabel("Vazão (m³/s)")
-    ax2[1].set_title("Vazão na válvula")
-    ax2[1].legend(loc='upper left', fontsize=10)
-    ax2[1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
-    """
 
     ## --- Gráfico da pressão no meio da tubulação ---
-    pressao_meio, = ax2[1].plot(tempo, coluna_m_pressao, color='b', label='Pressão')
-    ax2[1].set_xlabel("Tempo (s)")
-    ax2[1].set_ylabel("Pressão (m.c.a.)")
-    ax2[1].set_title("Pressão no meio (b)")
-    ax2[1].legend(loc='upper left', fontsize=10)
-    ax2[1].grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
+    fig_b, ax_b = plt.subplots(figsize=(30, 20))
+    pressao_meio, = ax_b.plot(tempo, coluna_m_pressao, color='b', label='Pressão')
+    ax_b.set_xlabel("Tempo (s)",fontsize=30)
+    ax_b.set_ylabel("Pressão (m.c.a.)", fontsize=30)
+    ax_b.set_xlim(0, 60)
+    ax_b.set_ylim(-140, 170)
+    #ax_b.set_aspect('equal') # Se quiser que o gráfico possua a mesma escala no eixo x e y
+    ax_b.tick_params(axis='both', labelsize=25)
+    ax_b.grid(True, which='both', linestyle='--', linewidth=0.5, color='gray', alpha=0.7 )
 
     ## --- Função para atualizar o gráfico da pressão no tempo ---
     if animacao:
@@ -215,17 +208,19 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
         anim_p.save(caminho_anim, writer="pillow", fps=30)
         plt.close(fig1)
 
-    nome_arquivo = f"caso_{caso_simulado}.png"  # Define o nome do arquivo para salvar o gráfico
-    caminho = os.path.join(pasta_saida, nome_arquivo)     # Define o caminho para salvar a imagem
+    caminho_a = os.path.join(pasta_saida, f"caso_{caso_simulado}(a).png")    # Salva o primeiro gráfico
+    fig_a.savefig(caminho_a, dpi=300, bbox_inches="tight")
+    plt.close(fig_a)
 
-    plt.savefig(caminho, dpi=300, bbox_inches="tight")    # 
-    plt.close(fig2)   # MUITO IMPORTANTE, FECHA A IMAGEM PARA SIMULAR O PRXIMO CASO COM UM GRÁFICO VAZIO.
+    caminho_b = os.path.join(pasta_saida, f"caso_{caso_simulado}(b).png")    # Salva o segudo gráfico
+    fig_b.savefig(caminho_b, dpi=300, bbox_inches="tight")
+    plt.close(fig_b)
 
     t_fim = time.time()
     tempo_caso = t_fim - t_inicio
     tempo_casos.append(tempo_caso)
 
-print("\nResumo dos tempos de simulação:")
+print("\nResumo dos tempos de simulação:")    # Mostra um resumo dos tempos de simulação
 
 for i, tempo in enumerate(tempo_casos):
     print(f"Caso {i}: {tempo:.2f} s")
@@ -244,7 +239,7 @@ with open(caminho_tempo, "w", encoding="utf-8") as f:
     f.write(f"\nTempo total: {sum(tempo_casos):.2f} s\n")
     f.write(f"Tempo médio por caso: {np.mean(tempo_casos):.2f} s\n")
 
-tabela_maximos = np.array(tabela_maximos)
+tabela_maximos = np.array(tabela_maximos)    # Salva os dados das pressões máximas e mínimas em uma tabela.
 caminho_tabela = os.path.join(pasta_saida, "resumo_pressao.csv")
 
 np.savetxt(

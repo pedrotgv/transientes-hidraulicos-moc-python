@@ -1,71 +1,81 @@
-# Simulação de Transientes Hidráulicos com o Método das Características (MOC)
+# 🌊 Simulação de Transientes Hidráulicos (Golpe de Aríete) em Python
 
-Este repositório contém o código desenvolvido para o Trabalho de Conclusão de Curso *“Análise de Transientes Hidráulicos com o Método das Características e Simulação Computacional em Python”*, que implementa uma simulação completa do fenômeno do *golpe de aríete* em uma tubulação pressurizada.
+Este repositório contém o código-fonte desenvolvido como parte do meu Trabalho de Conclusão de Curso (TCC) em Engenharia Civil pela Universidade Federal de Uberlândia (UFU).
 
-A rotina numérica aplica o *Método das Características (MOC)* para resolver as equações da continuidade e da quantidade de movimento em regime transitório, permitindo o cálculo da pressão e da vazão ao longo da tubulação ao longo do tempo.
+* 
+**Autor:** Pedro Thomaz Gonzales Viviani 
 
----
+* 
+**Orientadora:** Prof. Alice Rosa da Silva 
 
-## 📌 Objetivos do código
+* 
+**Coorientador:** Bruno de Oliveira Lázaro 
 
-- Modelar um sistema simples composto por *reservatório – tubulação – válvula*.
-- Simular o fechamento progressivo da válvula e os efeitos do golpe de aríete.
-- Calcular a evolução temporal da *pressão* e *vazão* em cada ponto da tubulação.
-- Gerar:
-  - Envoltórias de pressão  
-  - Gráficos de vazão e pressão em pontos específicos  
-  - Animação da propagação de pressão ao longo do tubo  
-
----
-
-## 📐 Formulação Matemática
-
-O código implementa as equações do Método das Características:
-
-- Linhas características *C+* e *C−*
-- Cálculo de `cp`, `cn`, `Ca` e `k`
-- Atualização da pressão e vazão para cada nó da malha ao longo do tempo
-- Inclusão das condições de contorno de:
-  - Reservatório (pressão fixa)
-  - Válvula (fechamento linear ao longo do tempo)
-
----
-
-## 🧮 Parâmetros principais
-
-Todos os parâmetros estão definidos no início do código e podem ser alterados conforme necessidade:
-
-| Parâmetro | Significado | Valor padrão |
-|----------|-------------|--------------|
-| `Lt` | Comprimento da tubulação (m) | 1000 |
-| `Dx` | Discretização espacial (m) | 1 |
-| `D` | Diâmetro interno (m) | 1 |
-| `f` | Fator de atrito | 0.02 |
-| `H0` | Carga no reservatório (m.c.a) | 10 |
-| `c` | Celeridade da onda (m/s) | 1000 |
-| `TF` | Tempo de fechamento da válvula (s) | `Tal` |
-
-O usuário pode modificar facilmente estes valores para estudar diferentes cenários.
-
----
-
-## 📊 Resultados gerados pelo programa
-
-O código produz:
-
-### *1. Envoltória de Pressões*
-Mostra os valores máximos e mínimos obtidos em cada ponto da tubulação.
-
-### *2. Pressão no meio da tubulação ao longo do tempo*
-Permite observar oscilações, amortecimento e comportamento transitório.
-
-### *3. Vazão na válvula*
-Exibe o fechamento da válvula e suas repercussões na vazão.
-
-### *4. Vazão no meio da tubulação*
-Útil para visualizar inversões e oscilações de fluxo.
-
-### *5. Animação da propagação de pressão*
-O gráfico dinamiza a variação espacial e temporal da pressão.
+* 
+**Ano:** 2026 
 
 
+## 📖 Sobre o Projeto
+
+O objetivo deste trabalho é apresentar o desenvolvimento e a aplicação de um algoritmo computacional, implementado na linguagem Python, para análise de transientes hidráulicos em condutos forçados, com ênfase no fenômeno do golpe de aríete.
+
+Utilizando o Método das Características (MOC), foram formuladas e discretizadas as equações da hidráulica, considerando condições de contorno típicas de sistemas de reservatório, tubo e válvula (RTV). A simulação, aplicada a um modelo de tubulação com fechamento brusco de válvula, gera resultados estáticos, em forma de gráficos, e dinâmicos, por meio de vídeos, evidenciando a propagação de ondas de pressão e as variações de vazão ao longo do tempo.
+
+O estudo contribui para a compreensão e visualização do comportamento transitório em sistemas hidráulicos, oferecendo uma ferramenta de baixo custo, de fácil replicação e alinhada às recomendações normativas, com potencial para aplicação acadêmica e profissional.
+
+## ⚙️ Funcionalidades do Código
+
+* **Simulação de Múltiplos Cenários:** É possível definir uma lista de casos a serem simulados de forma sequencial, variando parâmetros como discretização espacial, diâmetro, espessura, material (ex: Aço, PVC) e o tempo de fechamento da válvula.
+* **Cálculo da Celeridade da Onda:** O código calcula de forma autônoma a celeridade da onda de pressão com base nas características geométricas e propriedades físicas do tubo.
+* **Linearização do Atrito:** Considera as perdas de carga distribuídas ao longo da tubulação durante a execução do Método das Características.
+* **Geração de Gráficos:**
+* **Gráfico (a):** Envoltórias de pressão máxima e mínima ao longo do comprimento da tubulação.
+* **Gráfico (b):** Histórico de pressões no meio da tubulação em função do tempo.
+
+
+* **Animações Dinâmicas (Opcional):** Geração de GIFs mostrando a onda de pressão propagando-se pela tubulação ao longo do tempo.
+* **Exportação de Relatórios:** Exporta automaticamente os tempos de simulação (`.txt`) e uma tabela com os valores consolidados das pressões máximas e mínimas (`.csv`).
+
+## 🚀 Como Utilizar
+
+### 1. Pré-requisitos
+
+Certifique-se de ter o Python instalado. O código utiliza as seguintes bibliotecas, que podem ser instaladas via `pip`:
+
+```bash
+pip install numpy matplotlib tqdm
+
+```
+
+### 2. Configurando a Simulação
+
+No script, você pode configurar os casos que deseja simular alterando a matriz `casos`. Cada caso consiste em uma lista com os seguintes parâmetros na respectiva ordem:
+`[Dx (m), Di (mm), Espessura (mm), kt, TF (fração do período da tubulação), TT (s), Material]`
+
+Para habilitar a geração dos vídeos da propagação da onda (arquivos `.gif`), altere a variável `animacao` no início do código para `True`:
+
+```python
+animacao = True
+
+```
+
+*Aviso: Habilitar a animação exigirá um maior poder de processamento e aumentará o tempo total da simulação.*
+
+### 3. Execução
+
+Execute o script Python pelo terminal:
+
+```bash
+python nome_do_arquivo.py
+
+```
+
+O programa criará automaticamente uma pasta chamada `graficos_slicing/` no mesmo diretório em que o script está sendo executado. Todos os resultados serão salvos dentro dela.
+
+## 📊 Estrutura dos Resultados (`graficos_slicing/`)
+
+* `caso_X(a).png`: Gráfico da envoltória de pressões (máximas e mínimas) ao longo da tubulação para o caso simulado.
+* `caso_X(b).png`: Gráfico do comportamento da pressão no tempo (avaliado no meio do tubo).
+* `animacao_caso_X.gif`: Animação da propagação da onda de pressão (caso ativada nas configurações).
+* `resumo_pressao.csv`: Tabela sumarizada com as pressões máximas e mínimas absolutas de todos os casos.
+* `resumo_tempos_simulacao.txt`: Relatório de desempenho contendo o tempo de processamento gasto em cada cenário simulado.
