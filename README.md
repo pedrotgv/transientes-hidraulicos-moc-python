@@ -2,16 +2,12 @@
 
 Este repositório contém o código-fonte desenvolvido como parte do meu Trabalho de Conclusão de Curso (TCC) em Engenharia Civil pela Universidade Federal de Uberlândia (UFU).
 
-* 
 **Autor:** Pedro Thomaz Gonzales Viviani 
 
-* 
 **Orientadora:** Prof. Alice Rosa da Silva 
 
-* 
 **Coorientador:** Bruno de Oliveira Lázaro 
 
-* 
 **Ano:** 2026 
 
 
