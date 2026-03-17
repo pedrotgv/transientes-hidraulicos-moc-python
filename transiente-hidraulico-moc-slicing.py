@@ -83,7 +83,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
         # ---  SIMULAÇÃO (Vetorizada) --- 
     for t in tqdm(range(1, Nt+1), desc=f"Caso {caso_simulado} – tempo", leave=False):     # Inicia a simulaçao olhando para cada tempo
                 
-        tempo.append(t*Dt)     # Insere o valor do tempo em uma tabela para gerar os gráficos      
+        tempo.append(t*Dt)     # Insere o valor do tempo em uma tabela para gerar os gráficos (Eixo x)      
 
         # ---------------------------------------------------------
         # 1. PONTOS INTERNOS (Cálculo simultâneo de i=1 até Nx-1)
@@ -102,7 +102,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
         
         fator_atrito =  k * (np.abs(Q_esq) + np.abs(Q_dir))
         
-        # Cálculo final da Vazão (Qp) com o denominador
+        # Cálculo final da Vazão (Qp)
         vazao[t, 1:-1] = (Cp + Cn) / (2 + fator_atrito)
         
         # Cálculo da Pressão (Hp)
@@ -138,7 +138,7 @@ for caso_simulado in tqdm(range(len(casos)), desc="Simulando casos"):     # Inic
     coluna_v_final = vazao[:, Nx]                          # Última coluna da matriz de vazão.
     coluna_m_pressao = pressao[:, pressao.shape[1] // 2]   # Coluna do meio da matriz de vazão
 
-    tabela_maximos.append([caso_simulado, np.max(pressao),np.min(pressao)])
+    tabela_maximos.append([caso_simulado, np.max(pressao),np.min(pressao)]) # Tabela com os valores para acesso rápido.
 
     # --- CRIAÇÃO DA ANIMAÇÃO ---
     ## --- Gráfico da pressão ao longo da tubulação que será utilizado na animação ---
