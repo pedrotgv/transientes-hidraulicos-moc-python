@@ -6,6 +6,7 @@ from casos import casos
 
 pasta_saida = "resultados_graficos_h5"    # Define a pasta onde os gráficos serão salvos
 os.makedirs(pasta_saida, exist_ok=True)  
+t_fonte = 35
 
 with h5.File('dados_simulacao.h5', 'r') as hdf:
     for caso_simulado in range(len(casos)):
@@ -31,7 +32,7 @@ with h5.File('dados_simulacao.h5', 'r') as hdf:
         tabela_maximos=grupo_atual['tabela_maximos'][:]
    
         # --- GRÁFICOS ---
-        fig, ax = plt.subplots(1,2, figsize=(50, 25))
+        fig, ax = plt.subplots(1,2, figsize=(30, 10))
 
 
         ## --- Gráfico das envoltórias ---
@@ -44,8 +45,9 @@ with h5.File('dados_simulacao.h5', 'r') as hdf:
 
         linha_terreno, = ax[0].plot(x, terreno, color='k', label='Tubulação', linestyle='--', alpha=0.8)
 
-        ax[0].set_xlabel("Comprimento (m)", fontsize=30)
-        ax[0].set_ylabel("Pressão (m.c.a)", fontsize=30)
+        ax[0].set_xlabel("Comprimento (m)", fontsize=t_fonte)
+        ax[0].set_ylabel("Pressão (m.c.a)", fontsize=t_fonte)
+        ax[0].set_title("(a) Envoltória da pressão", fontsize=t_fonte)
         ax[0].set_xlim(0, Lt)
         ax[0].set_ylim(-140, 170)
 
@@ -63,8 +65,9 @@ with h5.File('dados_simulacao.h5', 'r') as hdf:
 
         pressao_meio, = ax[1].plot(tempo, coluna_m_pressao, color='b', label='Pressão')
 
-        ax[1].set_xlabel("Tempo (s)",fontsize=30)
-        ax[1].set_ylabel("Pressão (m.c.a.)", fontsize=30)
+        ax[1].set_xlabel("Tempo (s)",fontsize=t_fonte)
+        ax[1].set_ylabel("Pressão (m.c.a.)", fontsize=t_fonte)
+        ax[1].set_title("(b) Pressão no meio da tubulação", fontsize=t_fonte)
         ax[1].set_xlim(0, 60)
         ax[1].set_ylim(-140, 170)
 
