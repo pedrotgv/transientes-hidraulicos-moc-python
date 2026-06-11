@@ -27,8 +27,7 @@ O estudo contribui para a compreensão e visualização do comportamento transit
 * **Geração de Gráficos:**
 * **Gráfico (a):** Envoltórias de pressão máxima e mínima ao longo do comprimento da tubulação.
 * **Gráfico (b):** Histórico de pressões no meio da tubulação em função do tempo.
-
-
+* **Geração de Banco de dados hdp5:** O programa pode gerar um banco de dados, salvando os dados das simulações em um arquivo .h5 
 * **Animações Dinâmicas (Opcional):** Geração de GIFs mostrando a onda de pressão propagando-se pela tubulação ao longo do tempo.
 * **Exportação de Relatórios:** Exporta automaticamente os tempos de simulação (`.txt`) e uma tabela com os valores consolidados das pressões máximas e mínimas (`.csv`).
 
@@ -39,13 +38,13 @@ O estudo contribui para a compreensão e visualização do comportamento transit
 Certifique-se de ter o Python instalado. O código utiliza as seguintes bibliotecas, que podem ser instaladas via `pip`:
 
 ```bash
-pip install numpy matplotlib tqdm
+pip install requirements.txt
 
 ```
 
 ### 2. Configurando a Simulação
 
-No script, você pode configurar os casos que deseja simular alterando a matriz `casos`. Cada caso consiste em uma lista com os seguintes parâmetros na respectiva ordem:
+No script casos.py, você pode configurar os casos que deseja simular alterando a matriz `casos`. Cada caso consiste em uma lista com os seguintes parâmetros na respectiva ordem:
 `[Dx (m), Di (mm), Espessura (mm), kt, TF (fração do período da tubulação), TT (s), Material]`
 
 Para habilitar a geração dos vídeos da propagação da onda (arquivos `.gif`), altere a variável `animacao` no início do código para `True`:
@@ -67,6 +66,9 @@ python nome_do_arquivo.py
 ```
 
 O programa criará automaticamente uma pasta chamada `graficos_slicing/` no mesmo diretório em que o script está sendo executado. Todos os resultados serão salvos dentro dela.
+Caso opte por salvar em um banco de dados .h5 basta seguir o mesmo procedimento mas utilizando o script transiente-hidraulico-moc-slicing-hdp5.py
+Para obter os gráficos e o resumo das pressões a partir de um banco de daos .h5 basta executar o script transiente-hidraulico-moc-slicing-graficos-hdp5.py
+
 
 ## 📊 Estrutura dos Resultados (`graficos_slicing/`)
 
@@ -75,3 +77,15 @@ O programa criará automaticamente uma pasta chamada `graficos_slicing/` no mesm
 * `animacao_caso_X.gif`: Animação da propagação da onda de pressão (caso ativada nas configurações).
 * `resumo_pressao.csv`: Tabela sumarizada com as pressões máximas e mínimas absolutas de todos os casos.
 * `resumo_tempos_simulacao.txt`: Relatório de desempenho contendo o tempo de processamento gasto em cada cenário simulado.
+
+## 📊 Estrutura do banco de dados (`dados_simulacao.h5`)
+* **Grupo 0** - Contém os dados da simulação do caso 0
+    * **datasheet** - Pressão
+    * **datasheet** - Vazão
+    * **datasheet** - Tempo
+    * **datasheet** - Posição_x
+    * **datasheet** - Tabela de máximos
+    * **datasheet** - Terreno
+    * **Atributos** - São salvos os dados: [Dx], [Di], [e], [kt], [TF], [TT], [material] e [Lt]
+... São criados um grupo por simulação e todos são salvos no mesmo arquivo dados_simulacao.h5
+
