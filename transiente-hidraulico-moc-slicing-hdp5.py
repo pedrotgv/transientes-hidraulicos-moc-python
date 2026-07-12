@@ -5,12 +5,11 @@ import time
 import h5py as h5
 from casos import casos
 
-# Define os casos simulados, na ordem: [0]Dx (m), [1]Di (mm), [2]e(mm), [3]kt, [4]TF(s), [5]TT(s), [6]Material
-
 
 tempo_casos = []        # Matriz para simular o tempo dos casos
 tabela_maximos = []     # Tabela para armazenar os valores de máximos e mínimos de cada simulação
 cota_terreno = 0        # Define uma cota para a tubulação horizontal
+
 
 with h5.File('dados_simulacao.h5', 'w') as hdf:
 
