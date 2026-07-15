@@ -42,7 +42,7 @@ pip install requirements.txt
 
 ```
 
-Observação:É recomendado fazer a instalação das bibliotecas em um ambiente virtual
+Observação: É recomendado fazer a instalação das bibliotecas em um ambiente virtual
 ```bash
 python -m venv venv
 source venv/Scripts/activate
