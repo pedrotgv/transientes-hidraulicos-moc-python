@@ -1,0 +1,11 @@
+﻿Cenário;Coef. Sensibilidade dx;Coef. Sensibilidade Diâmetro;Coef. Sensibilidade Tempo Manobra;Coef. Sensibilidade Celeridade;Coef. Sensibilidade Velocidade Inicial
+Caso 0;nan;nan;nan;nan;nan
+Caso 1;inf;0.33;5.05;-5.21;0.74
+Caso 2;-inf;0.52;6.61;-6.34;0.90
+Caso 3;-0.00;inf;inf;inf;inf
+Caso 4;0.00;inf;inf;inf;inf
+Caso 5;inf;inf;-0.01;inf;inf
+Caso 6;-inf;-inf;-0.17;-inf;-inf
+Caso 7;-inf;5.21;-0.49;1.03;10.18
+Caso 8;-inf;1.89;-0.53;1.12;3.48
+Caso 9;-inf;1.26;-0.59;1.23;2.14
